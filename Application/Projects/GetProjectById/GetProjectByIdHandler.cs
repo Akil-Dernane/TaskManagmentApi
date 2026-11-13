@@ -9,7 +9,7 @@ namespace Application.Projects.GetProjectById
             GetProjectByIdQuery query,
             CancellationToken ct)
         {
-            var project = await projectRepository.GetByIdAsync(query.Id,ct ) ?? throw new KeyNotFoundException("Project not found.");
+            var project = await projectRepository.GetDetailsByIdAsync(query.Id,ct ) ?? throw new KeyNotFoundException("Project not found.");
 
             return project;
         }

@@ -21,7 +21,7 @@ namespace Application.Projects.CreateProject
             _clock = clock;
         }
 
-        public async System.Threading.Tasks.Task<Guid> Handle(CreateProjectCommand command, CancellationToken ct)
+        public async Task<Guid> Handle(CreateProjectCommand command, CancellationToken ct)
         {
             if (await _projectRepository.ExistsByNameAsync(command.Name, ct))
                 throw new ConflictException("A project with this name already exists.");

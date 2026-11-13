@@ -25,13 +25,18 @@ namespace Infrastructure.Persistence.Repositories
                 .AnyAsync(p => p.Name.ToLower() == normalizedName, ct);
         }
 
-        public async Task<ProjectDetailsDto?> GetByIdAsync(Guid id, CancellationToken ct)
+        public async Task<Project?> GetByIdAsync(Guid id, CancellationToken ct)
+        {
+            return await _dbContext.Projects.FirstOrDefaultAsync(p => p.Id == id, ct);
+        }
+
+        public async Task<ProjectDetailsDto?> GetDetailsByIdAsync(Guid id, CancellationToken ct)
         {
             return await _dbContext.Projects
                 .AsNoTracking()
                 .Where(p => p.Id == id)
                 .Select(p => new ProjectDetailsDto(
-                     p.Id,
+                    p.Id,
                     p.Name,
                     p.Description,
                     p.CreatedAtUtc,
