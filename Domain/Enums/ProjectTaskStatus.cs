@@ -3,7 +3,7 @@
     public enum ProjectTaskStatus
     {
         Todo, 
-        InProgress, 
-        Done
+        InProgress,
+        Completed
     }
 }

@@ -21,6 +21,7 @@ namespace Infrastructure
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
             services.AddScoped<IMemberRepository, MemberRepository>();
+            services.AddScoped<ITaskItemRepository, TaskItemRepository>();
             return services;
         }
 

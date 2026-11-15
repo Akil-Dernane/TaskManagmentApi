@@ -6,6 +6,7 @@ namespace Application.Abstractions.Persistence;
 public interface IProjectRepository
 {
     Task<bool> ExistsByNameAsync(string name, CancellationToken ct);
+    Task<bool> ExistsByIdAsync(Guid id, CancellationToken ct);
     Task AddAsync(Project project, CancellationToken ct);
 
     Task<ProjectDetailsDto?> GetDetailsByIdAsync(Guid id, CancellationToken ct);

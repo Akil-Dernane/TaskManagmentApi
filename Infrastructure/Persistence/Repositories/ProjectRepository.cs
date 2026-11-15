@@ -25,6 +25,11 @@ namespace Infrastructure.Persistence.Repositories
                 .AnyAsync(p => p.Name.ToLower() == normalizedName, ct);
         }
 
+        public async Task<bool> ExistsByIdAsync(Guid id, CancellationToken ct)
+        {
+            return await _dbContext.Projects
+                .AnyAsync(p => p.Id == id, ct);
+        }
         public async Task<Project?> GetByIdAsync(Guid id, CancellationToken ct)
         {
             return await _dbContext.Projects.FirstOrDefaultAsync(p => p.Id == id, ct);

@@ -3,7 +3,10 @@ using Application.Projects.ArchiveProject;
 using Application.Projects.CreateProject;
 using Application.Projects.GetProjectById;
 using Application.Projects.UpdateProject;
+using Application.Tasks.Enums;
+using Application.Tasks.GetTasksByProjectId;
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -16,16 +19,19 @@ namespace API.Controllers
         private readonly GetProjectByIdHandler _getProjectByIdHandler;
         private readonly UpdateProjectHandler _updateProjectHandler;
         private readonly ArchiveProjectHandler _archiveProjectHandler;
+        private readonly GetTasksByProjectIdHandler _getTasksByProjectIdHandler;
         public ProjectsController(
             CreateProjectHandler createProjectHandler,
             GetProjectByIdHandler getProjectByIdHandler,
             UpdateProjectHandler updateProjectHandler,
-            ArchiveProjectHandler archiveProjectHandler)
+            ArchiveProjectHandler archiveProjectHandler,
+            GetTasksByProjectIdHandler getTasksByProjectIdHandler)
         {
             _createProjectHandler = createProjectHandler;
             _getProjectByIdHandler = getProjectByIdHandler;
             _updateProjectHandler = updateProjectHandler;
-            _archiveProjectHandler = archiveProjectHandler; 
+            _archiveProjectHandler = archiveProjectHandler;
+            _getTasksByProjectIdHandler = getTasksByProjectIdHandler;
         }
 
         [HttpGet("{id:guid}")]
@@ -68,6 +74,29 @@ namespace API.Controllers
                 ct);
 
             return NoContent();
+        }
+
+        [HttpGet("{projectId:guid}/tasks")]
+        public async Task<ActionResult> GetTasksByProjectId(
+            Guid projectId,
+            CancellationToken ct,
+            [FromQuery] ProjectTaskPriority? priority = null,
+            [FromQuery] ProjectTaskStatus? status = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] TaskSortBy sortBy = TaskSortBy.CreatedAt,
+            [FromQuery] SortDirection sortDirection = SortDirection.Descending)
+        {
+            var tasks = await _getTasksByProjectIdHandler.Handle(new GetTasksByProjectIdQuery(
+                projectId, 
+                priority, 
+                status,
+                page,
+                pageSize,
+                sortBy,
+                sortDirection
+                ), ct);
+            return Ok(tasks);
         }
     }
 }
