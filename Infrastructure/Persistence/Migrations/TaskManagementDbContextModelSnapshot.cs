@@ -73,6 +73,9 @@ namespace Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("AssignedMemberId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -107,6 +110,8 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssignedMemberId");
+
                     b.HasIndex("ProjectId");
 
                     b.ToTable("TaskItems");
@@ -114,6 +119,11 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.TaskItem", b =>
                 {
+                    b.HasOne("Domain.Entities.Member", null)
+                        .WithMany()
+                        .HasForeignKey("AssignedMemberId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Domain.Entities.Project", null)
                         .WithMany()
                         .HasForeignKey("ProjectId")

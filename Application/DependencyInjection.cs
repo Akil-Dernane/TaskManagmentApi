@@ -5,6 +5,7 @@ using Application.Projects.ArchiveProject;
 using Application.Projects.CreateProject;
 using Application.Projects.GetProjectById;
 using Application.Projects.UpdateProject;
+using Application.Tasks.AssignTask;
 using Application.Tasks.ChangeTaskPriority;
 using Application.Tasks.CompleteTask;
 using Application.Tasks.CreateTaskItem;
@@ -12,6 +13,7 @@ using Application.Tasks.GetTaskItemById;
 using Application.Tasks.GetTasksByProjectId;
 using Application.Tasks.ReopenTask;
 using Application.Tasks.StartTask;
+using Application.Tasks.UnassignTask;
 using Application.Tasks.UpdateTaskItem;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,6 +38,8 @@ namespace Application
             services.AddTransient<CompleteTaskHandler>();
             services.AddTransient<ReopenTaskHandler>();
             services.AddTransient<ChangeTaskPriorityHandler>();
+            services.AddTransient<AssignTaskHandler>();
+            services.AddTransient<UnassignTaskHandler>();
 
             return services;
         }

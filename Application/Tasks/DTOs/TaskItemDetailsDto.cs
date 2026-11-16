@@ -6,6 +6,7 @@ namespace Application.Tasks.DTOs
     public record TaskItemDetailsDto(
         Guid Id,
         Guid ProjectId,
+        Guid? AssignedMemberId,
         string Title,
         string? Description,
         ProjectTaskStatus Status,

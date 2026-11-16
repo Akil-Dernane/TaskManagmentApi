@@ -6,6 +6,7 @@ namespace Domain.Entities
     {
         public Guid Id { get;}
         public Guid ProjectId { get;}
+        public Guid? AssignedMemberId { get; private set; }
         public string Title { get; private set; }
         public string? Description { get; private set; }
 
@@ -103,6 +104,33 @@ namespace Domain.Entities
             EnsureUtc(updatedAt,nameof(updatedAt));
 
             Priority = priority;
+            UpdatedAt = updatedAt;
+        }
+
+        public void Assign(Guid memberId, DateTime updatedAt)
+        {
+            if (memberId == Guid.Empty)
+                throw new ArgumentException("MemberId is required", nameof(memberId));
+
+            if (AssignedMemberId is not null)
+                throw new InvalidOperationException("The task is already assigned.");
+
+            if(Status == ProjectTaskStatus.Completed)
+                throw new InvalidOperationException("Cannot assign a member to a completed task.");
+
+            EnsureUtc(updatedAt, nameof(updatedAt));
+
+            AssignedMemberId = memberId;
+            UpdatedAt = updatedAt;
+        }
+        public void Unassign(DateTime updatedAt)
+        {
+            if (AssignedMemberId is null)
+                throw new InvalidOperationException("The task is already unassigned");
+
+            EnsureUtc(updatedAt, nameof(updatedAt));
+
+            AssignedMemberId = null;
             UpdatedAt = updatedAt;
         }
         private static void EnsureUtc(DateTime dateTime, string paramName)

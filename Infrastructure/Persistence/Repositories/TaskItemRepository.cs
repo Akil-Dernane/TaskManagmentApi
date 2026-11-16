@@ -80,7 +80,7 @@ namespace Infrastructure.Persistence.Repositories
 
             var results = await query
                 .Select(t => new TaskItemDetailsDto(
-                    t.Id, t.ProjectId, t.Title, t.Description,
+                    t.Id, t.ProjectId, t.AssignedMemberId, t.Title, t.Description,
                     t.Status, t.Priority, t.DueDate, t.CompletedAt,
                     t.CreatedAt, t.UpdatedAt))
                 .ToListAsync(ct);
@@ -94,7 +94,7 @@ namespace Infrastructure.Persistence.Repositories
                 .AsNoTracking()
                 .Where(t => t.Id == id)
                 .Select(t => new TaskItemDetailsDto(
-                    t.Id, t.ProjectId, t.Title, t.Description, 
+                    t.Id, t.ProjectId, t.AssignedMemberId, t.Title, t.Description, 
                     t.Status, t.Priority, t.DueDate, t.CompletedAt, 
                     t.CreatedAt, t.UpdatedAt))
                 .FirstOrDefaultAsync(ct);

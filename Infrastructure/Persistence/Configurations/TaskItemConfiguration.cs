@@ -20,6 +20,8 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(t => t.ProjectId)
                 .IsRequired();
 
+            builder.Property(t => t.AssignedMemberId);
+
             builder.Property(t => t.Status)
                 .IsRequired()
                 .HasConversion<string>();
@@ -39,6 +41,11 @@ namespace Infrastructure.Persistence.Configurations
                 .WithMany()
                 .HasForeignKey(t => t.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne<Member>()
+                .WithMany()
+                .HasForeignKey(t => t.AssignedMemberId)
+                .OnDelete(DeleteBehavior.SetNull);
 
         }
     }

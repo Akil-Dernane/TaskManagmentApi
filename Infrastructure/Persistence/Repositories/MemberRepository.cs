@@ -23,6 +23,12 @@ namespace Infrastructure.Persistence.Repositories
 
         }
 
+        public async Task<bool> ExistsByIdAsync(Guid id, CancellationToken ct)
+        {
+            return await _dbContext.Members
+                .AnyAsync(t => t.Id == id, ct);
+        }
+
         public async Task<Member?> GetByIdAsync(Guid id, CancellationToken ct)
         {
             return await _dbContext.Members
