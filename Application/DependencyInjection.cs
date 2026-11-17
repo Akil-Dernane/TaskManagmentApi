@@ -1,9 +1,12 @@
 ﻿
 
 using Application.Members;
+using Application.Projects.AddProjectMember;
 using Application.Projects.ArchiveProject;
+using Application.Projects.ChangeProjectMemberRole;
 using Application.Projects.CreateProject;
 using Application.Projects.GetProjectById;
+using Application.Projects.RemoveProjectMember;
 using Application.Projects.UpdateProject;
 using Application.Tasks.AssignTask;
 using Application.Tasks.ChangeTaskPriority;
@@ -27,6 +30,9 @@ namespace Application
             services.AddTransient<GetProjectByIdHandler>();
             services.AddTransient<UpdateProjectHandler>();
             services.AddTransient<ArchiveProjectHandler>();
+            services.AddTransient<AddProjectMemberHandler>();
+            services.AddTransient<RemoveProjectMemberHandler>();
+            services.AddTransient<ChangeProjectMemberRoleHandler>();
 
             services.AddScoped<IMemberService, MemberService>();
 

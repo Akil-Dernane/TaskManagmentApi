@@ -11,7 +11,7 @@ namespace Infrastructure.Persistence
         public DbSet<Project> Projects { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<TaskItem> TaskItems { get; set; }
-
+        public DbSet<ProjectMembership> ProjectMemberships { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(

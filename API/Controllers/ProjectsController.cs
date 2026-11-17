@@ -1,7 +1,10 @@
 ﻿using API.Contracts.Projects;
+using Application.Projects.AddProjectMember;
 using Application.Projects.ArchiveProject;
+using Application.Projects.ChangeProjectMemberRole;
 using Application.Projects.CreateProject;
 using Application.Projects.GetProjectById;
+using Application.Projects.RemoveProjectMember;
 using Application.Projects.UpdateProject;
 using Application.Tasks.Enums;
 using Application.Tasks.GetTasksByProjectId;
@@ -20,18 +23,27 @@ namespace API.Controllers
         private readonly UpdateProjectHandler _updateProjectHandler;
         private readonly ArchiveProjectHandler _archiveProjectHandler;
         private readonly GetTasksByProjectIdHandler _getTasksByProjectIdHandler;
+        private readonly AddProjectMemberHandler _addProjectMemberHandler;
+        private readonly RemoveProjectMemberHandler _removeProjectMemberHandler;
+        private readonly ChangeProjectMemberRoleHandler _changeProjectMemberRoleHandler;
         public ProjectsController(
             CreateProjectHandler createProjectHandler,
             GetProjectByIdHandler getProjectByIdHandler,
             UpdateProjectHandler updateProjectHandler,
             ArchiveProjectHandler archiveProjectHandler,
-            GetTasksByProjectIdHandler getTasksByProjectIdHandler)
+            GetTasksByProjectIdHandler getTasksByProjectIdHandler,
+            AddProjectMemberHandler addProjectMemberHandler,
+            RemoveProjectMemberHandler removeProjectMemberHandler,
+            ChangeProjectMemberRoleHandler changeProjectMemberRoleHandler)
         {
             _createProjectHandler = createProjectHandler;
             _getProjectByIdHandler = getProjectByIdHandler;
             _updateProjectHandler = updateProjectHandler;
             _archiveProjectHandler = archiveProjectHandler;
             _getTasksByProjectIdHandler = getTasksByProjectIdHandler;
+            _addProjectMemberHandler = addProjectMemberHandler;
+            _removeProjectMemberHandler = removeProjectMemberHandler;
+            _changeProjectMemberRoleHandler = changeProjectMemberRoleHandler;
         }
 
         [HttpGet("{id:guid}")]
@@ -97,6 +109,34 @@ namespace API.Controllers
                 sortDirection
                 ), ct);
             return Ok(tasks);
+        }
+
+        [HttpPost("{projectId:guid}/members")]
+        public async Task<IActionResult> AddProjectMember(Guid projectId, AddProjectMemberRequest request, CancellationToken ct)
+        {
+            await _addProjectMemberHandler.Handle(new AddProjectMemberCommand(projectId, request.MemberId!.Value, request.Role!.Value), ct);
+
+            return NoContent();
+        }
+
+        [HttpDelete("{projectId:guid}/members/{memberId:guid}")]
+        public async Task<IActionResult> RemoveProjectMember(Guid projectId, Guid memberId, CancellationToken ct)
+        {
+            await _removeProjectMemberHandler.Handle(new RemoveProjectMemberCommand(projectId, memberId), ct);
+
+            return NoContent();
+        }
+
+        [HttpPut("{projectId:guid}/members/{memberId:guid}/role")]
+        public async Task<IActionResult> ChangeProjectMemberRole(
+            Guid projectId, 
+            Guid memberId, 
+            ChangeProjectMemberRoleRequest request, 
+            CancellationToken ct)
+        {
+            await _changeProjectMemberRoleHandler.Handle(new ChangeProjectMemberRoleCommand(projectId, memberId, request.Role!.Value), ct);
+
+            return NoContent();
         }
     }
 }

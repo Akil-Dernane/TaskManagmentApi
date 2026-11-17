@@ -22,6 +22,8 @@ namespace Infrastructure
 
             services.AddScoped<IMemberRepository, MemberRepository>();
             services.AddScoped<ITaskItemRepository, TaskItemRepository>();
+
+            services.AddScoped<IProjectMembershipRepository, ProjectMembershipRepository>();
             return services;
         }
 

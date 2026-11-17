@@ -67,6 +67,35 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ProjectMembership", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("JoinedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("MemberId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MemberId");
+
+                    b.HasIndex("ProjectId", "MemberId")
+                        .IsUnique();
+
+                    b.ToTable("ProjectMemberships");
+                });
+
             modelBuilder.Entity("Domain.Entities.TaskItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -115,6 +144,21 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("TaskItems");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ProjectMembership", b =>
+                {
+                    b.HasOne("Domain.Entities.Member", null)
+                        .WithMany()
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Project", null)
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.TaskItem", b =>
