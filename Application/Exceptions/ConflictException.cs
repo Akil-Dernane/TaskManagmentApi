@@ -1,6 +1,7 @@
 ﻿namespace Application.Exceptions
 {
-    public class ConflictException(String message) : Exception(message)
+    public class ConflictException(string message)
+        : ApplicationException(message, "RESOURCE_CONFLICT")
     {
     }
 }

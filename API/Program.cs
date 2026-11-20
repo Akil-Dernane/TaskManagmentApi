@@ -9,6 +9,7 @@ namespace API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
             builder.Host.UseDefaultServiceProvider(options =>
             {
                 options.ValidateScopes = true;
@@ -39,6 +40,7 @@ namespace API
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

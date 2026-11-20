@@ -27,6 +27,10 @@ public class GlobalExceptionHandler(
             KeyNotFoundException =>
                 (404, "Not Found", exception.Message),
 
+            IdentityCreationException identityException =>
+                (400, "Identity Validation Error",
+                    string.Join(" ", identityException.Errors)),
+
             _ =>
                 (500, "Internal Server Error",
                     "An unexpected error occurred.")

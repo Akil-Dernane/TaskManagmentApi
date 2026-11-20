@@ -19,6 +19,7 @@ namespace API
             services.AddHealthChecks();
 
             services.AddProblemDetails();
+            services.AddExceptionHandler<AuthenticationExceptionHandler>();
             services.AddExceptionHandler<GlobalExceptionHandler>();
 
             return services;

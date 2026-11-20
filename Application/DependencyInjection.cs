@@ -1,5 +1,9 @@
 ﻿
 
+using Application.Authentication.Login;
+using Application.Authentication.Logout;
+using Application.Authentication.Refresh;
+using Application.Authentication.Register;
 using Application.Members;
 using Application.Projects.AddProjectMember;
 using Application.Projects.ArchiveProject;
@@ -26,6 +30,13 @@ namespace Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+            services.AddScoped<RegisterUserHandler>();
+            services.AddScoped<LoginUserHandler>();
+            services.AddScoped<RefreshTokenHandler>();
+
+            services.AddScoped<LogoutHandler>();
+            services.AddScoped<LogoutAllHandler>();
+
             services.AddTransient<CreateProjectHandler>();
             services.AddTransient<GetProjectByIdHandler>();
             services.AddTransient<UpdateProjectHandler>();
