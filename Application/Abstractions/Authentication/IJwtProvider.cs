@@ -2,6 +2,6 @@
 {
     public interface IJwtProvider
     {
-        Task<AccessTokenResult> GenerateAccessTokenAsync( Guid userId, string email, CancellationToken ct);
+        Task<AccessTokenResult> GenerateAccessTokenAsync( Guid userId, Guid memberId, string email, CancellationToken ct);
     }
 }

@@ -17,7 +17,7 @@ namespace Infrastructure.Authentication
             _jwtSettings = options.Value;
             _clock = clock;
         }
-        public Task<AccessTokenResult> GenerateAccessTokenAsync(Guid userId, string email, CancellationToken ct)
+        public Task<AccessTokenResult> GenerateAccessTokenAsync(Guid userId, Guid memberId, string email, CancellationToken ct)
         {
             var expiresAtUtc = _clock.UtcNow.AddMinutes(
                 _jwtSettings.AccessTokenMinutes);
@@ -26,7 +26,8 @@ namespace Infrastructure.Authentication
             {
                 new(JwtRegisteredClaimNames.Sub, userId.ToString()),
                 new(JwtRegisteredClaimNames.Email, email),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new("memberId", memberId.ToString())
             };
 
             var signingKey = new SymmetricSecurityKey(

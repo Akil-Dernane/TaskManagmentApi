@@ -24,17 +24,20 @@ namespace API.ExceptionHandling
                 UnauthorizedException =>
                     (StatusCodes.Status401Unauthorized, "Unauthorized"),
 
-                AccountLockedException =>
-                    (StatusCodes.Status423Locked, "Account Locked"),
-
-                ForbiddenException =>
-                    (StatusCodes.Status403Forbidden, "Forbidden"),
-
                 InvalidRefreshTokenException => 
                     (StatusCodes.Status401Unauthorized, "Invalid refresh token"),
 
                 RefreshTokenReuseException => 
                     (StatusCodes.Status401Unauthorized, "Refresh token reuse detected"),
+
+                ForbiddenAccessException =>
+                    (StatusCodes.Status403Forbidden, "Forbidden"),
+
+                AccountLockedException =>
+                    (StatusCodes.Status423Locked, "Account Locked"),
+
+                ForbiddenException =>
+                    (StatusCodes.Status403Forbidden, "Forbidden"),
 
                 _ => (0, string.Empty)
             };

@@ -30,6 +30,7 @@ namespace Application.Authentication.Register
 
             var accessToken = await jwtProvider.GenerateAccessTokenAsync(
                 userId,
+                member.Id,
                 command.Email,
                 ct);
 

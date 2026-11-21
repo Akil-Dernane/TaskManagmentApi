@@ -1,5 +1,6 @@
-﻿using Application.Abstractions;
+﻿using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
+using Application.Exceptions;
 using Domain.Enums;
 
 namespace Application.Projects.RemoveProjectMember
@@ -8,21 +9,34 @@ namespace Application.Projects.RemoveProjectMember
         IProjectRepository projectRepository,
         IMemberRepository memberRepository,
         IProjectMembershipRepository projectMembershipRepository,
+        IProjectAuthorizationService projectAuthorizationService,
         IUnitOfWork unitOfWork)
     {
         public async Task Handle(RemoveProjectMemberCommand command, CancellationToken ct)
         {
             if (!await projectRepository.ExistsByIdAsync(command.ProjectId, ct))
-                throw new KeyNotFoundException("Project not found");
+                throw new KeyNotFoundException("Project not found.");
+
+            var isOwner = await projectAuthorizationService.HasRoleAsync(
+                command.ProjectId, ProjectRole.Owner, ct);
+
+            var isManager = await projectAuthorizationService.HasRoleAsync(
+                command.ProjectId, ProjectRole.Manager, ct);
+
+            if (!isOwner && !isManager)
+                throw new ForbiddenAccessException();
 
             if (!await memberRepository.ExistsByIdAsync(command.MemberId, ct))
-                throw new KeyNotFoundException("Member not found");
+                throw new KeyNotFoundException("Member not found.");
 
-            var membership = await projectMembershipRepository.GetByProjectAndMemberAsync(command.ProjectId, command.MemberId, ct) ?? throw new KeyNotFoundException("Membership doesn't exists.");
+            var membership = await projectMembershipRepository.GetByProjectAndMemberAsync(
+                command.ProjectId,
+                command.MemberId,
+                ct) ?? throw new KeyNotFoundException("Membership doesn't exist.");
 
             if (membership.Role == ProjectRole.Owner)
                 throw new InvalidOperationException("Can't remove the owner membership.");
-            
+
             projectMembershipRepository.Remove(membership);
 
             await unitOfWork.SaveChangesAsync(ct);

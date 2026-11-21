@@ -1,4 +1,5 @@
 ﻿using API.ExceptionHandling;
+using Microsoft.AspNetCore.Authorization;
 using System.Text.Json.Serialization;
 
 namespace API
@@ -8,6 +9,12 @@ namespace API
         public static IServiceCollection AddApi(
             this IServiceCollection services)
         {
+            services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
 
             services.AddControllers()
             .AddJsonOptions(options =>

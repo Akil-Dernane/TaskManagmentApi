@@ -1,13 +1,14 @@
 ﻿using Application.Abstractions.Authentication;
+using Application.Abstractions.Persistence;
 using Application.Exceptions;
-using Domain.Entities;
 
 namespace Application.Authentication.Login
 {
     public class LoginUserHandler(
         IIdentityService identityService,
         IRefreshTokenService refreshTokenService,
-        IJwtProvider jwtProvider)
+        IJwtProvider jwtProvider,
+        IMemberRepository memberRepository)
     {
         public async Task<AuthenticationResult> Handle(LoginUserCommand command, CancellationToken ct)
         {
@@ -22,8 +23,12 @@ namespace Application.Authentication.Login
                     {
                         var userId = result.UserId!.Value;
 
+                        var member = await memberRepository.GetByUserIdAsync(userId, ct)
+                            ?? throw new KeyNotFoundException("Member not found.");
+
                         var accessToken = await jwtProvider.GenerateAccessTokenAsync(
                             userId,
+                            member.Id,
                             command.Email,
                             ct);
 

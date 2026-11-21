@@ -7,7 +7,6 @@ using Application.Authentication.Register;
 using Application.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -21,6 +20,8 @@ namespace API.Controllers
          LogoutHandler logoutHandler,
          LogoutAllHandler logoutAllHandler) : ControllerBase
     {
+
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult<AuthenticationResult>> Register(RegisterUserRequest request, CancellationToken ct)
         {
@@ -31,6 +32,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<AuthenticationResult>> Login(LoginUserRequest request, CancellationToken ct)
         {
@@ -39,6 +41,8 @@ namespace API.Controllers
             return Ok(result);
         }
 
+
+        [AllowAnonymous]
         [HttpPost("refresh")]
         public async Task<ActionResult<AuthenticationResult>> Refresh(RefreshTokenRequest request, CancellationToken ct)
         {
@@ -49,6 +53,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout(RefreshTokenRequest request, CancellationToken ct)
         {

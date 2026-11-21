@@ -1,7 +1,9 @@
 ﻿using Application.Abstractions;
 using Application.Abstractions.Authentication;
+using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
 using Infrastructure.Authentication;
+using Infrastructure.Authorization;
 using Infrastructure.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
@@ -87,6 +89,9 @@ namespace Infrastructure
             services.AddScoped<ITaskItemRepository, TaskItemRepository>();
 
             services.AddScoped<IProjectMembershipRepository, ProjectMembershipRepository>();
+
+            services.AddScoped<IProjectAuthorizationService, ProjectAuthorizationService>();
+
             return services;
         }
 

@@ -32,5 +32,22 @@ namespace Infrastructure.Authentication
 
         public bool IsAuthenticated =>
             _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
+
+        public Guid? MemberId
+        {
+            get
+            {
+                var user = _httpContextAccessor.HttpContext?.User;
+
+                if (user?.Identity?.IsAuthenticated != true)
+                    return null;
+
+                var member = user.FindFirstValue("memberId");
+
+                return Guid.TryParse(member, out var parsedMemberId)
+                    ? parsedMemberId
+                    : null;
+            }
+        }
     }
 }
