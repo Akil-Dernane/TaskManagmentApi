@@ -1,11 +1,15 @@
 ﻿using Application.Abstractions.Authentication;
+using Application.Abstractions.Persistence;
+using Domain.Entities;
 
 namespace Application.Authentication.Register
 {
     public class RegisterUserHandler(
         IIdentityService identityService,
         IJwtProvider jwtProvider,
-        IRefreshTokenService refreshTokenService)
+        IRefreshTokenService refreshTokenService,
+        IMemberRepository memberRepository,
+        IUnitOfWork unitOfWork)
     {
         public async Task<AuthenticationResult> Handle(
             RegisterUserCommand command,
@@ -15,6 +19,14 @@ namespace Application.Authentication.Register
                 command.Email,
                 command.Password,
                 ct);
+
+            var member = new Member(command.Email);
+
+            member.LinkToUser(userId);
+
+            await memberRepository.AddAsync(member, ct);
+
+            await unitOfWork.SaveChangesAsync(ct);
 
             var accessToken = await jwtProvider.GenerateAccessTokenAsync(
                 userId,

@@ -1,6 +1,7 @@
 ﻿using API.Contracts.Members;
 using Application.Members;
 using Application.Members.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -38,6 +39,13 @@ namespace API.Controllers
         {
             await _memberService.UpdateMemberAsync(id, new UpdateMemberDto(request.Email), ct);
             return NoContent();
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<ActionResult<MemberDetailsDto>> GetCurrentMemberDetailsAsync(CancellationToken ct)
+        {
+            return await _memberService.GetCurrentMemberDetailsAsync(ct);
         }
     }
 }

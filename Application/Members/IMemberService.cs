@@ -9,5 +9,7 @@ namespace Application.Members
         Task UpdateMemberAsync(Guid id, UpdateMemberDto dto, CancellationToken ct);
 
         Task<MemberDetailsDto> GetMemberDetailsByIdAsync(Guid id, CancellationToken ct);
+
+        Task<MemberDetailsDto> GetCurrentMemberDetailsAsync(CancellationToken ct);
     }
 }

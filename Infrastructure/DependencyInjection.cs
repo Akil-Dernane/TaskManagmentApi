@@ -75,6 +75,9 @@ namespace Infrastructure
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 
             services.AddSingleton<IClock, SystemClock>();
             services.AddScoped<IProjectRepository, ProjectRepository>();

@@ -35,11 +35,26 @@ namespace Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(m => m.Id == id,ct);
         }
 
+        public async Task<Member?> GetByUserIdAsync(Guid userId, CancellationToken ct)
+        {
+            return await _dbContext.Members
+                .FirstOrDefaultAsync(m => m.UserId == userId, ct);
+        }
+
+
         public async Task<MemberDetailsDto?> GetDetailsByIdAsync(Guid id, CancellationToken ct)
         {
             return await _dbContext.Members
                 .AsNoTracking()
                 .Where(m => m.Id == id)
+                .Select(m => new MemberDetailsDto(m.Id, m.Email))
+                .FirstOrDefaultAsync(ct);
+        }
+        public async Task<MemberDetailsDto?> GetDetailsByUserIdAsync(Guid userId, CancellationToken ct)
+        {
+            return await _dbContext.Members
+                .AsNoTracking()
+                .Where(m => m.UserId == userId)
                 .Select(m => new MemberDetailsDto(m.Id, m.Email))
                 .FirstOrDefaultAsync(ct);
         }

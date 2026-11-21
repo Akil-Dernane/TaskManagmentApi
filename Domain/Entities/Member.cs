@@ -6,6 +6,7 @@ public class Member
 {
     public Guid Id { get; }
     public string Email { get; private set; }
+    public Guid? UserId { get; private set; }
 
     public Member(string email)
     {
@@ -19,6 +20,17 @@ public class Member
     {
         ValidateEmail(email);
         Email = email;
+    }
+
+    public void LinkToUser(Guid userId)
+    {
+        if (userId == Guid.Empty)
+            throw new ArgumentException("User ID is required.", nameof(userId));
+
+        if (UserId.HasValue)
+            throw new InvalidOperationException("Member is already linked to a user.");
+
+        UserId = userId;
     }
 
     private static void ValidateEmail(string email)

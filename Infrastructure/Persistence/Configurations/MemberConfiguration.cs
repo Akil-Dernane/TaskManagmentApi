@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,6 +14,14 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(m => m.Email)
                 .IsRequired()
                 .HasMaxLength(254);
+
+            builder.HasIndex(m => m.UserId)
+                .IsUnique();
+
+            builder.HasOne<ApplicationUser>()
+                .WithOne()
+                .HasForeignKey<Member>(m => m.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

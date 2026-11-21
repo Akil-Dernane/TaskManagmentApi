@@ -1,4 +1,5 @@
-﻿using Application.Abstractions.Persistence;
+﻿using Application.Abstractions.Authentication;
+using Application.Abstractions.Persistence;
 using Application.Exceptions;
 using Application.Members.DTOs;
 using Domain.Entities;
@@ -9,13 +10,18 @@ namespace Application.Members
     {
         private readonly IMemberRepository _memberRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
         public MemberService(
             IMemberRepository memberRepository,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            ICurrentUserService currentUserService)
         {
             _memberRepository = memberRepository;
             _unitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
         }
+
+
         public async Task<Guid> CreateMemberAsync(CreateMemberDto dto, CancellationToken ct)
         {
             var member = new Member(dto.Email);
@@ -26,6 +32,15 @@ namespace Application.Members
             await _unitOfWork.SaveChangesAsync(ct);
 
             return member.Id;
+        }
+
+        public async Task<MemberDetailsDto> GetCurrentMemberDetailsAsync(CancellationToken ct)
+        {
+            var userId = _currentUserService.UserId 
+                ?? throw new UnauthorizedException();
+
+            return await _memberRepository.GetDetailsByUserIdAsync(userId, ct) 
+                ?? throw new KeyNotFoundException("Member not found");
         }
 
         public async Task<MemberDetailsDto> GetMemberDetailsByIdAsync(Guid id, CancellationToken ct)
