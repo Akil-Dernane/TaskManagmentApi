@@ -24,14 +24,9 @@ namespace Application.Projects.UpdateProject
         {
             var project = await _projectRepository.GetByIdAsync(command.Id, ct) ?? throw new KeyNotFoundException("Project not found.");
 
-            var isOwner = await _projectAuthorizationService.HasRoleAsync(
-                command.Id, ProjectRole.Owner, ct);
-
-            var isManager = await _projectAuthorizationService.HasRoleAsync(
-                command.Id, ProjectRole.Manager, ct);
-
-            if (!isOwner && !isManager)
-                throw new ForbiddenAccessException();
+            if (!await _projectAuthorizationService.HasPermissionAsync(
+                command.Id, ProjectPermission.UpdateProject, ct))
+                            throw new ForbiddenAccessException();
 
             var nameExists = await _projectRepository.ExistsByNameAsync(command.Name, ct);
 

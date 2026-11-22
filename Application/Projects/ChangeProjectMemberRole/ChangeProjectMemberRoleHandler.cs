@@ -21,14 +21,9 @@ namespace Application.Projects.ChangeProjectMemberRole
             if (!await projectRepository.ExistsByIdAsync(command.ProjectId, ct))
                 throw new KeyNotFoundException("Project not found.");
 
-            var isOwner = await projectAuthorizationService.HasRoleAsync(
-                command.ProjectId, ProjectRole.Owner, ct);
-
-            var isManager = await projectAuthorizationService.HasRoleAsync(
-                command.ProjectId, ProjectRole.Manager, ct);
-
-            if (!isOwner && !isManager)
-                throw new ForbiddenAccessException();
+            if (!await projectAuthorizationService.HasPermissionAsync(
+                command.ProjectId, ProjectPermission.ManageMembers, ct))
+                            throw new ForbiddenAccessException();
 
             if (!await memberRepository.ExistsByIdAsync(command.MemberId, ct))
                 throw new KeyNotFoundException("Member not found.");

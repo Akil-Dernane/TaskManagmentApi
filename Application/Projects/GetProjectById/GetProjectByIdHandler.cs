@@ -2,6 +2,7 @@
 using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
 using Application.Exceptions;
+using Domain.Enums;
 
 namespace Application.Projects.GetProjectById
 {
@@ -14,7 +15,8 @@ namespace Application.Projects.GetProjectById
         {
             var project = await projectRepository.GetDetailsByIdAsync(query.Id,ct ) ?? throw new KeyNotFoundException("Project not found.");
 
-            if (!await projectAuthorizationService.IsMemberAsync(query.Id, ct))
+            if (!await projectAuthorizationService.HasPermissionAsync(
+                query.Id, ProjectPermission.ViewProject, ct))
                 throw new ForbiddenAccessException();
 
             return project;

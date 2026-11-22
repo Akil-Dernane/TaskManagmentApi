@@ -24,11 +24,9 @@ namespace Application.Projects.ArchiveProject
         {
             var project = await _projectRepository.GetByIdAsync(command.Id, ct) ?? throw new KeyNotFoundException("Project not found.");
 
-            if (!await _projectAuthorizationService.HasRoleAsync(
-                command.Id, ProjectRole.Owner, ct))
-            {
-                throw new ForbiddenAccessException();
-            }
+            if (!await _projectAuthorizationService.HasPermissionAsync(
+                command.Id, ProjectPermission.ArchiveProject, ct))
+                            throw new ForbiddenAccessException();
 
             project.Archive();
 

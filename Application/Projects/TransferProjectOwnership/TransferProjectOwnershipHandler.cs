@@ -24,9 +24,9 @@ namespace Application.Projects.TransferProjectOwnership
             if (!await projectRepository.ExistsByIdAsync(command.ProjectId, ct))
                 throw new KeyNotFoundException("Project not found.");
 
-            if (!await projectAuthorizationService.HasRoleAsync(
-                command.ProjectId, ProjectRole.Owner, ct))
-                throw new ForbiddenAccessException();
+            if (!await projectAuthorizationService.HasPermissionAsync(
+                command.ProjectId, ProjectPermission.TransferOwnership, ct))
+                            throw new ForbiddenAccessException();
 
             var currentMemberId = currentUserService.MemberId
                 ?? throw new UnauthorizedException();

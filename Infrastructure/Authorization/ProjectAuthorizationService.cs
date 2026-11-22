@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
+using Application.Authorization;
 using Domain.Enums;
 namespace Infrastructure.Authorization
 {
@@ -9,24 +10,23 @@ namespace Infrastructure.Authorization
         IProjectMembershipRepository projectMembershipRepository
         ) : IProjectAuthorizationService
     {
-        public async Task<bool> HasRoleAsync(Guid projectId, ProjectRole role, CancellationToken ct)
+
+        public async Task<bool> HasPermissionAsync(Guid projectId, ProjectPermission permission, CancellationToken ct)
         {
             var memberId = currentUserService.MemberId;
 
-            if (memberId == null) return false;
+            if (memberId == null)
+                return false;
 
-            var membership = await projectMembershipRepository.GetByProjectAndMemberAsync(projectId, memberId.Value, ct);
+            var membership = await projectMembershipRepository
+                .GetByProjectAndMemberAsync(projectId, memberId.Value, ct);
 
-            return membership?.Role == role;
-        }
+            if (membership == null)
+                return false;
 
-        public async Task<bool> IsMemberAsync(Guid projectId, CancellationToken ct)
-        {
-            var memberId = currentUserService.MemberId;
-
-            if( memberId == null ) return false;
-
-            return await projectMembershipRepository.ExistsAsync(projectId, memberId.Value, ct);
+            return ProjectPermissionPolicy.IsGranted(
+                membership.Role,
+                permission);
         }
     }
 }
