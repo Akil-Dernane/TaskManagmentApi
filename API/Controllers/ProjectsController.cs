@@ -5,10 +5,10 @@ using Application.Projects.ChangeProjectMemberRole;
 using Application.Projects.CreateProject;
 using Application.Projects.GetProjectById;
 using Application.Projects.RemoveProjectMember;
+using Application.Projects.TransferProjectOwnership;
 using Application.Projects.UpdateProject;
 using Application.Tasks.Enums;
 using Application.Tasks.GetTasksByProjectId;
-using Domain.Entities;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,6 +26,7 @@ namespace API.Controllers
         private readonly AddProjectMemberHandler _addProjectMemberHandler;
         private readonly RemoveProjectMemberHandler _removeProjectMemberHandler;
         private readonly ChangeProjectMemberRoleHandler _changeProjectMemberRoleHandler;
+        private readonly TransferProjectOwnershipHandler _transferProjectOwnershipHandler;
         public ProjectsController(
             CreateProjectHandler createProjectHandler,
             GetProjectByIdHandler getProjectByIdHandler,
@@ -34,7 +35,8 @@ namespace API.Controllers
             GetTasksByProjectIdHandler getTasksByProjectIdHandler,
             AddProjectMemberHandler addProjectMemberHandler,
             RemoveProjectMemberHandler removeProjectMemberHandler,
-            ChangeProjectMemberRoleHandler changeProjectMemberRoleHandler)
+            ChangeProjectMemberRoleHandler changeProjectMemberRoleHandler,
+            TransferProjectOwnershipHandler transferProjectOwnershipHandler)
         {
             _createProjectHandler = createProjectHandler;
             _getProjectByIdHandler = getProjectByIdHandler;
@@ -44,6 +46,7 @@ namespace API.Controllers
             _addProjectMemberHandler = addProjectMemberHandler;
             _removeProjectMemberHandler = removeProjectMemberHandler;
             _changeProjectMemberRoleHandler = changeProjectMemberRoleHandler;
+            _transferProjectOwnershipHandler = transferProjectOwnershipHandler;
         }
 
         [HttpGet("{id:guid}")]
@@ -135,6 +138,16 @@ namespace API.Controllers
             CancellationToken ct)
         {
             await _changeProjectMemberRoleHandler.Handle(new ChangeProjectMemberRoleCommand(projectId, memberId, request.Role!.Value), ct);
+
+            return NoContent();
+        }
+
+        [HttpPut("{projectId:guid}/transfer-ownership")]
+        public async Task<IActionResult> TransferOwnership(Guid projectId, TransferProjectOwnershipRequest request, CancellationToken ct)
+        {
+            await _transferProjectOwnershipHandler.Handle(
+                new TransferProjectOwnershipCommand(projectId, request.NewOwnerMemberId!.Value),
+                ct);
 
             return NoContent();
         }

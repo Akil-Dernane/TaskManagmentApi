@@ -11,6 +11,7 @@ using Application.Projects.ChangeProjectMemberRole;
 using Application.Projects.CreateProject;
 using Application.Projects.GetProjectById;
 using Application.Projects.RemoveProjectMember;
+using Application.Projects.TransferProjectOwnership;
 using Application.Projects.UpdateProject;
 using Application.Tasks.AssignTask;
 using Application.Tasks.ChangeTaskPriority;
@@ -44,6 +45,7 @@ namespace Application
             services.AddTransient<AddProjectMemberHandler>();
             services.AddTransient<RemoveProjectMemberHandler>();
             services.AddTransient<ChangeProjectMemberRoleHandler>();
+            services.AddTransient<TransferProjectOwnershipHandler>();
 
             services.AddScoped<IMemberService, MemberService>();
 
