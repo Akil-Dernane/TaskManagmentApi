@@ -86,7 +86,9 @@ namespace Infrastructure
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
             services.AddScoped<IMemberRepository, MemberRepository>();
+
             services.AddScoped<ITaskItemRepository, TaskItemRepository>();
+            services.AddScoped<ITaskAuthorizationService, TaskAuthorizationService>();
 
             services.AddScoped<IProjectMembershipRepository, ProjectMembershipRepository>();
 

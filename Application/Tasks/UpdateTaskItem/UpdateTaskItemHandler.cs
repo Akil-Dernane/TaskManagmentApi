@@ -1,22 +1,36 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
+using Application.Exceptions;
 
 namespace Application.Tasks.UpdateTaskItem
 {
     public class UpdateTaskItemHandler(
-        ITaskItemRepository _taskItemRepository,
-        IUnitOfWork _unitOfWork,
-        IClock _clock)
+        ITaskItemRepository taskItemRepository,
+        ITaskAuthorizationService taskAuthorizationService,
+        IUnitOfWork unitOfWork,
+        IClock clock)
     {
         public async Task Handle(UpdateTaskItemCommand command, CancellationToken ct)
         {
-            var taskItem = await _taskItemRepository.GetByIdAsync(command.Id, ct) ?? throw new KeyNotFoundException("Task not found");
+            var taskItem = await taskItemRepository.GetByIdAsync(command.Id, ct)
+                ?? throw new KeyNotFoundException("Task not found.");
 
-            var now = _clock.UtcNow;
+            if (!await taskAuthorizationService.CanUpdateTaskAsync(
+                taskItem.ProjectId,
+                taskItem.AssignedMemberId,
+                ct))
+                throw new ForbiddenAccessException();
 
-            taskItem.UpdateDetails(command.Title, command.Description, command.DueDate, now);
+            var now = clock.UtcNow;
 
-            await _unitOfWork.SaveChangesAsync(ct);
+            taskItem.UpdateDetails(
+                command.Title,
+                command.Description,
+                command.DueDate,
+                now);
+
+            await unitOfWork.SaveChangesAsync(ct);
         }
     }
 }

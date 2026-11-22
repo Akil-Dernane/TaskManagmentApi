@@ -1,20 +1,30 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
+using Application.Exceptions;
 
 namespace Application.Tasks.CompleteTask
 {
     public class CompleteTaskHandler(
-        ITaskItemRepository _taskItemRepository,
-        IUnitOfWork _unitOfWork,
-        IClock _clock)
+        ITaskItemRepository taskItemRepository,
+        ITaskAuthorizationService taskAuthorizationService,
+        IUnitOfWork unitOfWork,
+        IClock clock)
     {
         public async Task Handle(CompleteTaskCommand command, CancellationToken ct)
         {
-            var taskItem = await _taskItemRepository.GetByIdAsync(command.Id, ct) ?? throw new KeyNotFoundException("Task not found.");
+            var taskItem = await taskItemRepository.GetByIdAsync(command.Id, ct)
+                ?? throw new KeyNotFoundException("Task not found.");
 
-            taskItem.Complete(_clock.UtcNow);
+            if (!await taskAuthorizationService.CanUpdateTaskAsync(
+                taskItem.ProjectId,
+                taskItem.AssignedMemberId,
+                ct))
+                throw new ForbiddenAccessException();
 
-            await _unitOfWork.SaveChangesAsync(ct);
+            taskItem.Complete(clock.UtcNow);
+
+            await unitOfWork.SaveChangesAsync(ct);
         }
     }
 }

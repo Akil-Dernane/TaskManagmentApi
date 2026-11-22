@@ -1,23 +1,35 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
+using Application.Exceptions;
+using Domain.Enums;
 
 namespace Application.Tasks.AssignTask
 {
     public class AssignTaskHandler(
-        ITaskItemRepository _taskItemRepository, 
-        IMemberRepository _memberRepository,
-        IClock _clock, 
-        IUnitOfWork _unitOfWork)
+        ITaskItemRepository taskItemRepository,
+        IMemberRepository memberRepository,
+        ITaskAuthorizationService taskAuthorizationService,
+        IClock clock,
+        IUnitOfWork unitOfWork)
     {
         public async Task Handle(AssignTaskCommand command, CancellationToken ct)
         {
-            var taskItem = await _taskItemRepository.GetByIdAsync(command.TaskId, ct) ?? throw new KeyNotFoundException("Task not found");
+            var taskItem = await taskItemRepository.GetByIdAsync(command.TaskId, ct)
+                ?? throw new KeyNotFoundException("Task not found.");
 
-            if(!await _memberRepository.ExistsByIdAsync(command.MemberId, ct)) throw new KeyNotFoundException("Member not found.");
+            if (!await taskAuthorizationService.HasPermissionAsync(
+                taskItem.ProjectId,
+                TaskPermission.AssignTasks,
+                ct))
+                throw new ForbiddenAccessException();
 
-            taskItem.Assign(command.MemberId, _clock.UtcNow);
+            if (!await memberRepository.ExistsByIdAsync(command.MemberId, ct))
+                throw new KeyNotFoundException("Member not found.");
 
-            await _unitOfWork.SaveChangesAsync(ct);
+            taskItem.Assign(command.MemberId, clock.UtcNow);
+
+            await unitOfWork.SaveChangesAsync(ct);
         }
     }
 }

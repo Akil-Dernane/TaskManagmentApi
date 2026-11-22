@@ -1,20 +1,30 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
+using Application.Exceptions;
 
 namespace Application.Tasks.StartTask
 {
     public class StartTaskHandler(
-        ITaskItemRepository _taskItemRepository,
-        IUnitOfWork _unitOfWork,
-        IClock _clock)
+        ITaskItemRepository taskItemRepository,
+        ITaskAuthorizationService taskAuthorizationService,
+        IUnitOfWork unitOfWork,
+        IClock clock)
     {
-        public async Task Handle(StartTaskCommand command, CancellationToken ct) 
+        public async Task Handle(StartTaskCommand command, CancellationToken ct)
         {
-            var taskItem = await _taskItemRepository.GetByIdAsync(command.Id, ct) ?? throw new KeyNotFoundException("TAsk not found");
+            var taskItem = await taskItemRepository.GetByIdAsync(command.Id, ct)
+                ?? throw new KeyNotFoundException("Task not found.");
 
-            taskItem.Start(_clock.UtcNow);
+            if (!await taskAuthorizationService.CanUpdateTaskAsync(
+                taskItem.ProjectId,
+                taskItem.AssignedMemberId,
+                ct))
+                throw new ForbiddenAccessException();
 
-            await _unitOfWork.SaveChangesAsync(ct);
+            taskItem.Start(clock.UtcNow);
+
+            await unitOfWork.SaveChangesAsync(ct);
         }
     }
 }

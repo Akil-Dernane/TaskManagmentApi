@@ -1,20 +1,31 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
+using Application.Exceptions;
+using Domain.Enums;
 
 namespace Application.Tasks.UnassignTask
 {
     public class UnassignTaskHandler(
-         ITaskItemRepository _taskItemRepository,
-        IClock _clock,
-        IUnitOfWork _unitOfWork)
+        ITaskItemRepository taskItemRepository,
+        ITaskAuthorizationService taskAuthorizationService,
+        IClock clock,
+        IUnitOfWork unitOfWork)
     {
         public async Task Handle(UnassignTaskCommand command, CancellationToken ct)
         {
-            var taskItem = await _taskItemRepository.GetByIdAsync(command.TaskId, ct) ?? throw new KeyNotFoundException("Task not Found");
+            var taskItem = await taskItemRepository.GetByIdAsync(command.TaskId, ct)
+                ?? throw new KeyNotFoundException("Task not found.");
 
-            taskItem.Unassign(_clock.UtcNow);
+            if (!await taskAuthorizationService.HasPermissionAsync(
+                taskItem.ProjectId,
+                TaskPermission.AssignTasks,
+                ct))
+                throw new ForbiddenAccessException();
 
-            await _unitOfWork.SaveChangesAsync(ct);
+            taskItem.Unassign(clock.UtcNow);
+
+            await unitOfWork.SaveChangesAsync(ct);
         }
     }
 }

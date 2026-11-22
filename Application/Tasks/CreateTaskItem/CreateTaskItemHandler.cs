@@ -1,30 +1,41 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
+using Application.Exceptions;
 using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Tasks.CreateTaskItem
 {
-    public class CreateTaskItemHandler (
-        ITaskItemRepository _taskItemRepository,
-        IProjectRepository _projectRepository,
-        IUnitOfWork _unitOfWork,
-        IClock _clock )
+    public class CreateTaskItemHandler(
+        ITaskItemRepository taskItemRepository,
+        IProjectRepository projectRepository,
+        ITaskAuthorizationService taskAuthorizationService,
+        IUnitOfWork unitOfWork,
+        IClock clock)
     {
-        public async Task<Guid> Handle(CreateTaskItemCommand command, CancellationToken ct)
+        public async Task<Guid> Handle(
+            CreateTaskItemCommand command,
+            CancellationToken ct)
         {
-            var project = await _projectRepository.GetByIdAsync(command.ProjectId, ct) ?? throw new KeyNotFoundException("Project not found");
+            var project = await projectRepository.GetByIdAsync(command.ProjectId, ct)
+                ?? throw new KeyNotFoundException("Project not found.");
 
-            var now = _clock.UtcNow;
+            if (!await taskAuthorizationService.HasPermissionAsync(
+                command.ProjectId, TaskPermission.CreateTasks, ct))
+                throw new ForbiddenAccessException();
+
+            var now = clock.UtcNow;
 
             var taskItem = new TaskItem(
-                command.Title, 
-                now, 
-                command.ProjectId, 
-                command.Description, 
+                command.Title,
+                now,
+                command.ProjectId,
+                command.Description,
                 command.DueDate);
 
-            await _taskItemRepository.AddAsync(taskItem, ct);
-            await _unitOfWork.SaveChangesAsync( ct );
+            await taskItemRepository.AddAsync(taskItem, ct);
+            await unitOfWork.SaveChangesAsync(ct);
 
             return taskItem.Id;
         }

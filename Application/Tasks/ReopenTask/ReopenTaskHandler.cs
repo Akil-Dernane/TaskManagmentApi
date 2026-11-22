@@ -1,22 +1,30 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
-using Domain.Entities;
+using Application.Exceptions;
 
 namespace Application.Tasks.ReopenTask
 {
     public class ReopenTaskHandler(
-        ITaskItemRepository _taskItemRepository,
-        IUnitOfWork _unitOfWork,
-        IClock _clock
-        )
+        ITaskItemRepository taskItemRepository,
+        ITaskAuthorizationService taskAuthorizationService,
+        IUnitOfWork unitOfWork,
+        IClock clock)
     {
         public async Task Handle(ReopenTaskCommand command, CancellationToken ct)
         {
-            var taksItem = await _taskItemRepository.GetByIdAsync(command.Id, ct) ?? throw new KeyNotFoundException("Task not found.");
+            var taskItem = await taskItemRepository.GetByIdAsync(command.Id, ct)
+                ?? throw new KeyNotFoundException("Task not found.");
 
-            taksItem.Reopen(_clock.UtcNow);
+            if (!await taskAuthorizationService.CanUpdateTaskAsync(
+                taskItem.ProjectId,
+                taskItem.AssignedMemberId,
+                ct))
+                throw new ForbiddenAccessException();
 
-            await _unitOfWork.SaveChangesAsync(ct);
+            taskItem.Reopen(clock.UtcNow);
+
+            await unitOfWork.SaveChangesAsync(ct);
         }
     }
 }

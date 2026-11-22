@@ -1,20 +1,31 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Authorization;
 using Application.Abstractions.Persistence;
+using Application.Exceptions;
+using Domain.Enums;
 
 namespace Application.Tasks.ChangeTaskPriority
 {
     public class ChangeTaskPriorityHandler(
-        ITaskItemRepository _taskItemRepository,
-        IUnitOfWork _unitOfWork,
-        IClock _clock)
+        ITaskItemRepository taskItemRepository,
+        ITaskAuthorizationService taskAuthorizationService,
+        IUnitOfWork unitOfWork,
+        IClock clock)
     {
-        public async Task Handle(ChangeTaskPriorityCommand command, CancellationToken ct)
+        public async Task Handle(ChangeTaskPriorityCommand command,CancellationToken ct)
         {
-            var taskItem = await _taskItemRepository.GetByIdAsync(command.Id, ct) ?? throw new KeyNotFoundException("Task not found");
+            var taskItem = await taskItemRepository.GetByIdAsync(command.Id, ct)
+                ?? throw new KeyNotFoundException("Task not found.");
 
-            taskItem.ChangePriority(command.Priority, _clock.UtcNow);
+            if (!await taskAuthorizationService.HasPermissionAsync(
+                taskItem.ProjectId,
+                TaskPermission.ChangeTaskPriority,
+                ct))
+                throw new ForbiddenAccessException();
 
-            await _unitOfWork.SaveChangesAsync(ct);
+            taskItem.ChangePriority(command.Priority, clock.UtcNow);
+
+            await unitOfWork.SaveChangesAsync(ct);
         }
     }
 }
