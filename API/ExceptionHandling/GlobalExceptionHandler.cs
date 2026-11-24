@@ -51,6 +51,11 @@ public class GlobalExceptionHandler(
             Instance = context.Request.Path
         };
 
+        if (exception is Application.Exceptions.ApplicationException appException)
+        {
+            problemDetails.Extensions["errorCode"] = appException.ErrorCode;
+        }
+
         problemDetails.Extensions["traceId"] = context.TraceIdentifier;
 
         await problemDetailsService.WriteAsync(

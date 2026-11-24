@@ -11,6 +11,7 @@ using Application.Tasks.Enums;
 using Application.Tasks.GetTasksByProjectId;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Controllers
 {
@@ -92,15 +93,27 @@ namespace API.Controllers
         }
 
         [HttpGet("{projectId:guid}/tasks")]
+
         public async Task<ActionResult> GetTasksByProjectId(
             Guid projectId,
             CancellationToken ct,
-            [FromQuery] ProjectTaskPriority? priority = null,
-            [FromQuery] ProjectTaskStatus? status = null,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10,
-            [FromQuery] TaskSortBy sortBy = TaskSortBy.CreatedAt,
-            [FromQuery] SortDirection sortDirection = SortDirection.Descending)
+            [FromQuery, EnumDataType(typeof(ProjectTaskPriority))]
+            ProjectTaskPriority? priority = null,
+
+            [FromQuery, EnumDataType(typeof(ProjectTaskStatus))]
+            ProjectTaskStatus? status = null,
+
+            [FromQuery, Range(1, int.MaxValue)]
+                int page = 1,
+
+            [FromQuery, Range(1, 100)]
+            int pageSize = 10,
+
+            [FromQuery, EnumDataType(typeof(TaskSortBy))]
+            TaskSortBy sortBy = TaskSortBy.CreatedAt,
+
+            [FromQuery, EnumDataType(typeof(SortDirection))]
+            SortDirection sortDirection = SortDirection.Descending)
         {
             var tasks = await _getTasksByProjectIdHandler.Handle(new GetTasksByProjectIdQuery(
                 projectId, 

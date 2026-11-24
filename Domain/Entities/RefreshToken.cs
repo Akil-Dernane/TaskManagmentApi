@@ -71,6 +71,14 @@
         {
             EnsureUtc(revokedAtUtc, nameof(revokedAtUtc));
 
+            if (replacedByTokenHash is not null &&
+                string.IsNullOrWhiteSpace(replacedByTokenHash))
+            {
+                throw new ArgumentException(
+                    "Replacement token hash cannot be empty.",
+                    nameof(replacedByTokenHash));
+            }
+
             if (IsRevoked())
                 throw new InvalidOperationException(
                     "Refresh token is already revoked.");

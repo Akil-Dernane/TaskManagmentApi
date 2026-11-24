@@ -1,4 +1,5 @@
-﻿using Domain.Enums;
+﻿using API.Validation;
+using Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.Contracts.Projects
@@ -6,6 +7,7 @@ namespace API.Contracts.Projects
     public class AddProjectMemberRequest
     {
         [Required]
+        [NotEmptyGuid]
         public Guid? MemberId { get; set; }
 
         [Required]

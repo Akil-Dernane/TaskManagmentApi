@@ -10,6 +10,9 @@ namespace API.Contracts.Authentication
 
         [Required]
         [MinLength(8)]
+        [RegularExpression(
+            @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$",
+            ErrorMessage = "Password must contain uppercase, lowercase, digit, and special character.")]
         public string Password { get; set; } = string.Empty;
     }
 }

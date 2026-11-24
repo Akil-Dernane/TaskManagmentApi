@@ -22,7 +22,7 @@ namespace API
             builder.Services.AddApi();
 
 
-            builder.Services.AddControllers();
+            //builder.Services.AddControllers(); already called in API depedecies injection
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
@@ -33,7 +33,7 @@ namespace API
                 app.MapOpenApi();
             }
 
-            app.MapHealthChecks("/health");
+            app.MapHealthChecks("/health").AllowAnonymous();
 
             app.UseExceptionHandler();
 

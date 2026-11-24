@@ -5,7 +5,7 @@ namespace API.Contracts.Tasks
     public class UpdateTaskItemRequest
     {
         [Required]
-        [StringLength(200, MinimumLength = 1)]
+        [StringLength(200)]
         public string Title { get; set; } = string.Empty;
 
         [StringLength(2000)]

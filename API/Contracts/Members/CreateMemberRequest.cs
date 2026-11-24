@@ -1,4 +1,11 @@
-﻿namespace API.Contracts.Members
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace API.Contracts.Members
 {
-    public record CreateMemberRequest(string Email);
+    public class CreateMemberRequest
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+    }
 }

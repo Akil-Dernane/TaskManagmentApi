@@ -76,7 +76,9 @@ namespace Infrastructure.Persistence.Repositories
                 _ => throw new ArgumentOutOfRangeException(nameof(sortBy))
             };
 
-            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+            var skip = (int)Math.Min(((long)page - 1) * pageSize, int.MaxValue);
+
+            query = query.Skip(skip).Take(pageSize);
 
             var results = await query
                 .Select(t => new TaskItemDetailsDto(

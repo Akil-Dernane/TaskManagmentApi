@@ -41,9 +41,16 @@ namespace Infrastructure
                 .AddEntityFrameworkStores<TaskManagementDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+            var jwtSection = configuration.GetSection("Jwt");
 
-            var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>()!;
+            services.AddOptions<JwtSettings>()
+                .Bind(jwtSection)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            var jwtSettings = jwtSection.Get<JwtSettings>()
+                ?? throw new InvalidOperationException("JWT configuration is missing.");
+
             services
                 .AddAuthentication(options =>
                 {
@@ -63,8 +70,15 @@ namespace Infrastructure
 
                         ValidateLifetime = true,
 
+                        ClockSkew = TimeSpan.FromSeconds(30),
+
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+
+                        ValidAlgorithms = new[]
+                        {
+                            SecurityAlgorithms.HmacSha256
+                        },
                     };
                 });
 

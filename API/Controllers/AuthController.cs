@@ -6,7 +6,6 @@ using Application.Authentication.Logout;
 using Application.Authentication.Refresh;
 using Application.Authentication.Register;
 using Application.Exceptions;
-using Application.Projects.TransferProjectOwnership;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

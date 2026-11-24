@@ -22,6 +22,8 @@ namespace Infrastructure.Persistence.Configurations
             builder.HasIndex(rt => rt.TokenHash)
                 .IsUnique();
 
+            builder.HasIndex(rt => rt.UserId);
+
             builder.HasIndex(rt => rt.FamilyId);
 
             builder.Property(rt => rt.CreatedAtUtc)

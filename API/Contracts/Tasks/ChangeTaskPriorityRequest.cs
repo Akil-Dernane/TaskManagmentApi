@@ -1,5 +1,6 @@
 ﻿using Domain.Enums;
 using System.ComponentModel.DataAnnotations;
+
 namespace API.Contracts.Tasks
 {
     public class ChangeTaskPriorityRequest
